@@ -1,4 +1,4 @@
-Dự án này bao gồm các bước sau:
+## Dự án này bao gồm các bước sau:
 - Thu thập và xử lý dữ liệu thời tiết từ file Excel.
 - Thực hiện các phân tích thống kê, bao gồm nhiệt độ trung bình, độ ẩm và lượng mưa.
 - Vẽ các biểu đồ như scatter plot và bar plot để so sánh các chỉ số thời tiết.
