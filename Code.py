@@ -27,7 +27,6 @@ df_tong_hop = pd.concat([df_Ha_Noi[['Thanh_pho', 'Ngay', 'Nhiet_do_cao_nhat (oC)
 df_tong_hop['Ngay'] = pd.to_datetime(df_tong_hop['Ngay']).dt.strftime('%m/%d/%y')
 print(df_tong_hop) 
 
-print(type(df_tong_hop))
 #Vẽ biểu đồ scatter thể hiện mối quan hệ giữa nhiệt độ trung bình và Tình trạng thời tiết.
 import matplotlib.pyplot as plt
 
@@ -43,8 +42,29 @@ df_loc_du_lieu_high_temp = df_tong_hop[df_tong_hop['Nhiet_do_cao_nhat (oC)'] > 3
 # Lọc và tạo DataFrame mới df_loc_du_lieu cho các ngày có lượng mưa > 10mm
 df_loc_du_lieu_high_rain = df_tong_hop[df_tong_hop['Luong_mua(mm)'] > 10]
 
-print(df_loc_du_lieu_high_temp)
-print(df_loc_du_lieu_high_rain)
+# print(df_loc_du_lieu_high_temp)
+# print(df_loc_du_lieu_high_rain)
+
+# Tính toán thống kê cho từng thành phố theo tháng mà không thêm cột 'Tháng' vào df_tong_hop
+# Sử dụng .dt.month để trích xuất tháng từ cột 'Ngay'
+df_tong_hop['Ngay'] = pd.to_datetime(df_tong_hop['Ngay'], errors='coerce')
+df_thongke = df_tong_hop.groupby([df_tong_hop['Thanh_pho'], df_tong_hop['Ngay'].dt.month]).agg({
+    'Nhiet_do_trung_binh (oC)': 'mean',   # Nhiệt độ trung bình
+    'Do_am(%)': 'mean',                    # Độ ẩm trung bình
+    'Luong_mua(mm)': 'sum'                 # Tổng lượng mưa
+}).reset_index()
+
+# Đổi tên cột cho dễ hiểu
+df_thongke.rename(columns={
+    'Nhiet_do_trung_binh (oC)': 'Nhiet_do_trung_binh_theo_thang (oC)',
+    'Do_am(%)': 'Do_am_trung_binh_theo_thang (%)',
+    'Luong_mua(mm)': 'Tong_luong_mua_theo_thang (mm)',
+    'Ngay': 'Thang'  # Đổi tên cột 'Ngay' thành 'Thang' sau khi nhóm theo tháng
+}, inplace=True)
+
+# Kiểm tra kết quả
+# print(df_thongke)
+df_tong_hop['Ngay'] = pd.to_datetime(df_tong_hop['Ngay']).dt.strftime('%m/%d/%y')
 
 # Vẽ biểu đồ scatter thể hiện mối quan hệ giữa nhiệt độ trung bình và Tình trạng thời tiết.
 plt.figure(figsize=(10, 6))
@@ -54,9 +74,11 @@ plt.scatter(df_tong_hop['Nhiet_do_trung_binh (oC)'], df_tong_hop['Tinh_trang_tho
 plt.title('Mối quan hệ giữa nhiệt độ trung bình và tình trạng thời tiết')
 plt.xlabel('Nhiệt độ trung bình (°C)')
 plt.ylabel('Tình trạng thời tiết (0: Khô ráo, 1: Mưa)')
-
+# Lưu biểu đồ vào tệp hình ảnh (trước khi gọi plt.show())
+plt.savefig('scatter_plot.png', dpi=300)
 # Hiển thị biểu đồ
 plt.show()
+# Lưu biểu đồ vào tệp hình ảnh
 
 # Vẽ biểu đồ cột so sánh tổng lượng mưa giữa 3 thành phố.
 total_rain_by_city = df_tong_hop.groupby('Thanh_pho')['Luong_mua(mm)'].sum()
@@ -69,13 +91,15 @@ total_rain_by_city.plot(kind='bar', color=['blue', 'orange', 'green'])
 plt.title('So sánh tổng lượng mưa giữa 3 thành phố')
 plt.xlabel('Thành phố')
 plt.ylabel('Tổng lượng mưa (mm)')
-
+# Lưu biểu đồ vào tệp hình ảnh
+plt.savefig('bar_plot_rain_comparison.png', dpi=300)
 plt.show()
+
 
 
 #g. Xuất dữ liệu: 
 with pd.ExcelWriter('weather_analysis.xlsx', engine='openpyxl') as writer:
     df_tong_hop.to_excel(writer, sheet_name='DataFrame Tong Hop', index=False)
-    df_TP_HCM.to_excel(writer, sheet_name='TP_HCM', index=False)
+    df_thongke.to_excel(writer, sheet_name='Kết Quả Thống Kê', index=False)
     df_loc_du_lieu_high_temp.to_excel(writer, sheet_name='Các ngày nóng cao', index=False)
     df_loc_du_lieu_high_rain.to_excel(writer, sheet_name='Các ngày mưa nhieu', index=False)
