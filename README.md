@@ -11,6 +11,6 @@
 - **API Requests**: Sử dụng API để yêu cầu dữ liệu và phân tích.
 
 ## Cài Đặt
-- **Thư viện pandas.
-- **Cần cài thêm các thư viện openmeteo_requests, requests_cache, retry_requests để sử dụng file jupiter notebook request_API.ipynb
-- **Cài các thư viện trên bằng cách pip install openmeteo_requests, ...
+- Thư viện pandas.
+- Cần cài thêm các thư viện openmeteo_requests, requests_cache, retry_requests để sử dụng file jupiter notebook request_API.ipynb
+- Cài các thư viện trên bằng cách pip install openmeteo_requests, ...
